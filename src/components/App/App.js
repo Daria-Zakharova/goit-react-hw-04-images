@@ -41,7 +41,7 @@ export class App extends Component {
     }
   }
 
-    setQuery = (e) => {
+  setQuery = (e) => {
     e.preventDefault();
 
     const searchQuery = e.target.elements.search.value;
