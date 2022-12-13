@@ -22,7 +22,7 @@ export class App extends Component {
   }
 
   async componentDidUpdate(_, prevState) {
-    const {query, page} = this.state;
+    const {query, page, modalImg} = this.state;
 
     if(query !== prevState.query || page !== prevState.page) {
       this.setState({loading: true});
@@ -33,7 +33,7 @@ export class App extends Component {
       bodyScroll.on();
     }
 // smooth scroll on next page render
-    if(page !== 1){
+    if(page !== 1 && !modalImg){
       window.scrollBy({
         top: (window.innerHeight - 160),
         behavior: 'smooth',
@@ -50,8 +50,10 @@ export class App extends Component {
     e.target.reset();  
   }
 
+  // Налаштування modalImg, щоб скролл відбувався після рендеру сторінки 
+  // (але не відбувався при закритті модального вікна)
   loadNextPage = () => {
-    this.setState(prevState => {return {page: (prevState.page + 1)}});
+    this.setState(prevState => {return {page: (prevState.page + 1), modalImg: null}});
   }
 
   openModal = (e) => {
@@ -74,7 +76,7 @@ export class App extends Component {
     }
 
     bodyScroll.on(); 
-    this.setState({modalOpen: false, modalImg: null})
+    this.setState({modalOpen: false})
   };
 
   render = () => {
