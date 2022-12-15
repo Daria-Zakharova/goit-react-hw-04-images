@@ -31,9 +31,9 @@ export class App extends Component {
       const response = await(await fetchImages(query, page)).data;
       const newImages = response.hits;
 
+
       if (newImages.length === 0) {
         this.setState({
-          query: '',
           images: [],
           page: 1,
           totalPages: 1,
@@ -41,15 +41,15 @@ export class App extends Component {
         });
         return toast.error("Sorry, there are no images matching your search query. Please try again.");
       }
-      
-      const pages = Math.ceil(response.totalHits / 12);
 
-      this.setState(prevState => {
+        const pages = Math.ceil(response.totalHits / 12);
+
+        this.setState(prevState => {
         return {
           images: [...prevState.images, ...newImages], 
           totalPages: pages, 
           loading: false,
-        }
+        }        
       });
     }
 // smooth scroll on next page render
