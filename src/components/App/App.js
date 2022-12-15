@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-// import { toast, Toaster } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import { fetchImages } from "utils/fetch-images";
 import { bodyScroll } from "utils/toggleScroll";
 import { AppEl } from "./App.styled";
@@ -25,12 +25,25 @@ export class App extends Component {
     const {query, page, modalImg} = this.state;
 
     if(query !== prevState.query || page !== prevState.page) {
+
       this.setState({loading: true});
-      bodyScroll.off();
-      const newImages = await(await fetchImages(query, page)).data;
-      const pages = await Math.ceil(newImages.totalHits / 12);
-      this.setState(prevState => {return {images: [...prevState.images, ...newImages.hits], totalPages: pages, loading: false}});
-      bodyScroll.on();
+
+      const response = await(await fetchImages(query, page)).data;
+      const newImages = response.hits;
+      const pages = Math.ceil(response.totalHits / 12);
+
+      if (newImages.length === 0) {
+        this.setState({loading: false});
+        return toast.error("Sorry, there are no images matching your search query. Please try again.");
+      }
+
+      this.setState(prevState => {
+        return {
+          images: [...prevState.images, ...newImages], 
+          totalPages: pages, 
+          loading: false,
+        }
+      });
     }
 // smooth scroll on next page render
     if(page !== 1 && !modalImg){
@@ -44,17 +57,24 @@ export class App extends Component {
   setQuery = (e) => {
     e.preventDefault();
     const {query} = this.state;
-    const searchQuery = e.target.elements.search.value;
+    const searchQuery = e.target.elements.search.value.trim().toLowerCase();
     
     if(searchQuery !== query){
-      this.setState({query: searchQuery, images: [], page: 1});
+      this.setState({
+        query: searchQuery, 
+        images: [], 
+        page: 1});
    }
   }
 
   // Налаштування modalImg, щоб скролл відбувався після рендеру сторінки 
   // (але не відбувався при закритті модального вікна)
   loadNextPage = () => {
-    this.setState(prevState => {return {page: (prevState.page + 1), modalImg: null}});
+    this.setState(prevState => {
+      return {
+        page: (prevState.page + 1), 
+        modalImg: null}
+      });
   }
 
   openModal = (e) => {
@@ -96,10 +116,11 @@ export class App extends Component {
 
     return (
       <AppEl disableScroll={modalOpen}>
+        <Toaster position="top-right"/>
         <SearchBar onSearch = {this.setQuery}/>
         {images.length > 0 && <ImageGallery images={images} onModalOpen={this.openModal}/>}
         {totalPages > page && <LoadMoreButton loadOnClick={this.loadNextPage}/>}
-        {modalOpen && <Modal modalImgSrc = {modalImg.url} description = {modalImg.alt} closeOnClick = {this.closeModalonClick} closeOnEsc = {this.closeModal}/>}
+        {modalOpen && <Modal modalImgSrc = {modalImg.url} description = {modalImg.alt} closeOnClick = {this.closeModalonClick}/>}
         {loading && <Loader/>}
       </AppEl>
     )
