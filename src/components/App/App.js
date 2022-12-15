@@ -30,12 +30,19 @@ export class App extends Component {
 
       const response = await(await fetchImages(query, page)).data;
       const newImages = response.hits;
-      const pages = Math.ceil(response.totalHits / 12);
 
       if (newImages.length === 0) {
-        this.setState({loading: false});
+        this.setState({
+          query: '',
+          images: [],
+          page: 1,
+          totalPages: 1,
+          loading: false,
+        });
         return toast.error("Sorry, there are no images matching your search query. Please try again.");
       }
+      
+      const pages = Math.ceil(response.totalHits / 12);
 
       this.setState(prevState => {
         return {
