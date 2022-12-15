@@ -43,11 +43,12 @@ export class App extends Component {
 
   setQuery = (e) => {
     e.preventDefault();
-
+    const {query} = this.state;
     const searchQuery = e.target.elements.search.value;
-    this.setState({query: searchQuery, images: [], page: 1});
-
-    e.target.reset();  
+    
+    if(searchQuery !== query){
+      this.setState({query: searchQuery, images: [], page: 1});
+   }
   }
 
   // Налаштування modalImg, щоб скролл відбувався після рендеру сторінки 
@@ -67,17 +68,28 @@ export class App extends Component {
     }    
     
     bodyScroll.off();
+    document.addEventListener('keydown', this.closeModalOnEsc);
     this.setState({modalOpen: true, modalImg: {url: imgLink, alt: imgDescription}});
   }
 
-  closeModal = (e) => {
+  closeModal = () => {
+    bodyScroll.on();  
+    document.removeEventListener('keydown', this.closeModalOnEsc);
+    this.setState({modalOpen: false});
+  }
+
+  closeModalonClick = (e) => {
     if(!e.target.classList.contains("overlay")){
       return;
     }
-
-    bodyScroll.on(); 
-    this.setState({modalOpen: false})
+    this.closeModal();    
   };
+
+  closeModalOnEsc = (e) => {
+    if(e.code === "Escape") {
+      this.closeModal();      
+    }
+  }
 
   render = () => {
     const {images, page, totalPages, modalOpen, modalImg, loading} = this.state;
@@ -87,7 +99,7 @@ export class App extends Component {
         <SearchBar onSearch = {this.setQuery}/>
         {images.length > 0 && <ImageGallery images={images} onModalOpen={this.openModal}/>}
         {totalPages > page && <LoadMoreButton loadOnClick={this.loadNextPage}/>}
-        {modalOpen && <Modal modalImgSrc = {modalImg.url} description = {modalImg.alt} onClose = {this.closeModal}/>}
+        {modalOpen && <Modal modalImgSrc = {modalImg.url} description = {modalImg.alt} closeOnClick = {this.closeModalonClick} closeOnEsc = {this.closeModal}/>}
         {loading && <Loader/>}
       </AppEl>
     )

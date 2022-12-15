@@ -1,5 +1,7 @@
 import { SearchWrap, SearchForm } from "./Searchbar.styled";
 import {GoSearch} from "react-icons/go";
+import PropTypes from 'prop-types';
+
 
 export const SearchBar = ({onSearch}) => {
     return (
@@ -12,4 +14,8 @@ export const SearchBar = ({onSearch}) => {
       autoFocus name="search" placeholder="Search images and photos"/>
         </SearchForm>
     </SearchWrap>)
+}
+
+SearchBar.propTypes = {
+    onSearch: PropTypes.func.isRequired,
 }
