@@ -63,8 +63,11 @@ export class App extends Component {
       this.setState({
         query: searchQuery, 
         images: [], 
-        page: 1});
-   }
+        page: 1,
+        totalPages: 1,
+        modalImg: null,
+      });
+    }
   }
 
   // Налаштування modalImg, щоб скролл відбувався після рендеру сторінки 
